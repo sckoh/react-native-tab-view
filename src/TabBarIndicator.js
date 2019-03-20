@@ -1,19 +1,21 @@
 /* @flow */
 
 import * as React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, I18nManager } from 'react-native';
 import Animated from 'react-native-reanimated';
 import type { ViewStyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
 import type { Route, SceneRendererProps, NavigationState } from './types';
 
 export type Props<T> = {|
   ...SceneRendererProps,
+  navigationState: NavigationState<T>,
   width: number,
   style?: ViewStyleProp,
 |};
 
 export default function TabBarIndicator<T: Route>(props: Props<T>) {
-  const { width, style, translateX } = props;
+  const { width, position, navigationState, style, translateX } = props;
+  const { routes } = navigationState;
   return (
     <Animated.View
       style={[

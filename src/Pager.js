@@ -154,8 +154,11 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
 
   // Current state of the gesture
   _velocityX = new Value(0);
+
   _gestureX = new Value(0);
+
   _gestureState = new Value(State.UNDETERMINED);
+
   _offsetX = new Value(0);
 
   // Current position of the page (translateX value)
@@ -181,10 +184,12 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
   // Mappings to some prop values
   // We use them in animation calculations, so we need live animated nodes
   _routesLength = new Value(this.props.navigationState.routes.length);
+
   _layoutWidth = new Value(this.props.layout.width);
 
   // Threshold values to determine when to trigger a swipe gesture
   _swipeDistanceThreshold = new Value(this.props.swipeDistanceThreshold || 180);
+
   _swipeVelocityThreshold = new Value(this.props.swipeVelocityThreshold);
 
   // Whether we need to add a listener for position change
@@ -258,6 +263,7 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
     const value = this.props.layout.width
       ? Math.abs(translateX / this.props.layout.width)
       : this.props.navigationState.index;
+    // const value = this.props.navigationState.index;
 
     this._positionListeners.forEach(listener => listener(value));
   };
