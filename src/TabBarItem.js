@@ -2,13 +2,13 @@
 
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
-import TouchableItem from './TouchableItem';
-import type { Scene, Route, NavigationState } from './types';
 import type {
   ViewStyleProp,
   TextStyleProp,
 } from 'react-native/Libraries/StyleSheet/StyleSheet';
 import Animated from 'react-native-reanimated';
+import TouchableItem from './TouchableItem';
+import type { Scene, Route, NavigationState } from './types';
 
 type Props<T> = {|
   position: Animated.Node,
@@ -65,6 +65,7 @@ export default function TabBarItem<T: Route>({
   tabWidth,
   onPress,
   onLongPress,
+  onLayout,
 }: Props<T>) {
   const tabIndex = navigationState.routes.indexOf(route);
   const isFocused = navigationState.index === tabIndex;
@@ -201,7 +202,11 @@ export default function TabBarItem<T: Route>({
       onLongPress={onLongPress}
       style={tabContainerStyle}
     >
-      <View pointerEvents="none" style={[styles.item, itemStyle, tabStyle]}>
+      <View
+        pointerEvents="none"
+        onLayout={onLayout}
+        style={[styles.item, itemStyle, tabStyle]}
+      >
         {icon}
         {label}
         {badge != null ? <View style={styles.badge}>{badge}</View> : null}

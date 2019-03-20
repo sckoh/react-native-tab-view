@@ -136,27 +136,25 @@ export default class TabView<T: Route> extends React.Component<
                     navigationState,
                   })}
                 {render(
-                  navigationState.routes.map((route, i) => {
-                    return (
-                      <SceneView
-                        {...sceneRendererProps}
-                        key={route.key}
-                        index={i}
-                        lazy={lazy}
-                        navigationState={navigationState}
-                        style={sceneContainerStyle}
-                      >
-                        {({ loading }) =>
-                          loading
-                            ? renderLazyPlaceholder({ route })
-                            : renderScene({
-                                ...sceneRendererProps,
-                                route,
-                              })
-                        }
-                      </SceneView>
-                    );
-                  })
+                  navigationState.routes.map((route, i) => (
+                    <SceneView
+                      {...sceneRendererProps}
+                      key={route.key}
+                      index={i}
+                      lazy={lazy}
+                      navigationState={navigationState}
+                      style={sceneContainerStyle}
+                    >
+                      {({ loading }) =>
+                        loading
+                          ? renderLazyPlaceholder({ route })
+                          : renderScene({
+                              ...sceneRendererProps,
+                              route,
+                            })
+                      }
+                    </SceneView>
+                  ))
                 )}
                 {tabBarPosition === 'bottom' &&
                   renderTabBar({
@@ -174,7 +172,6 @@ export default class TabView<T: Route> extends React.Component<
 
 const styles = StyleSheet.create({
   pager: {
-    flex: 1,
     overflow: 'hidden',
   },
 });

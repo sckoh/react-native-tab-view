@@ -136,12 +136,10 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
           this.props.swipeDistanceThreshold
         );
       }
-    } else {
-      if (prevProps.layout.width !== this.props.layout.width) {
-        this._swipeDistanceThreshold.setValue(
-          this.props.layout.width * SWIPE_DISTANCE_MULTIPLIER
-        );
-      }
+    } else if (prevProps.layout.width !== this.props.layout.width) {
+      this._swipeDistanceThreshold.setValue(
+        this.props.layout.width * SWIPE_DISTANCE_MULTIPLIER
+      );
     }
 
     if (

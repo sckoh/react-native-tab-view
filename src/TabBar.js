@@ -78,6 +78,11 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
   constructor(props: Props<T>) {
     super(props);
 
+    this.indicatorWidth = new Array();
+    for (let i = 0; i < this.props.navigationState.routes.length; i++) {
+      this.indicatorWidth.push(0);
+    }
+
     const initialOffset =
       this.props.scrollEnabled && this.props.layout.width
         ? {
@@ -127,6 +132,15 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
     this.props.removeListener('position', this._adjustScroll);
   }
 
+  _renderAutoWidthIndicator = (props: IndicatorProps<T>) => {
+    const { navigationState } = props;
+    let translateX = 0;
+    for (let i = 0; i < navigationState.index; i++) {
+      translateX += this.indicatorWidth[i];
+    }
+    return this.props.renderIndicator({ ...props, translateX });
+  };
+
   _scrollView: ?ScrollView;
   _isManualScroll: boolean = false;
   _isMomentumScroll: boolean = false;
@@ -164,21 +178,31 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
   };
 
   _normalizeScrollValue = (props, value) => {
-    const { layout, navigationState } = props;
-    const tabWidth = this._getTabWidth(props);
-    const tabBarWidth = Math.max(
-      tabWidth * navigationState.routes.length,
-      layout.width
-    );
+    const { layout } = props;
+    const tabBarWidth = Math.max(this._getTotalTabWidth(), layout.width);
     const maxDistance = tabBarWidth - layout.width;
-
     return Math.max(Math.min(value, maxDistance), 0);
+  };
+
+  _getTotalTabWidth = () => {
+    let totalTabWidth = 0;
+    for (j = 0; j < this.indicatorWidth.length; j++) {
+      totalTabWidth += this.indicatorWidth[j];
+    }
+    return totalTabWidth;
+  };
+
+  _getCenterTabWidth = i => {
+    let totalTabWidth = 0;
+    for (j = 0; j <= i; j++) {
+      totalTabWidth += this.indicatorWidth[j];
+    }
+    return totalTabWidth - this.indicatorWidth[i] / 2;
   };
 
   _getScrollAmount = (props, i) => {
     const { layout } = props;
-    const tabWidth = this._getTabWidth(props);
-    const centerDistance = tabWidth * (i + 1 / 2);
+    const centerDistance = this._getCenterTabWidth(i);
     const scrollAmount = centerDistance - layout.width / 2;
 
     return this._normalizeScrollValue(props, scrollAmount);
@@ -287,16 +311,29 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
               : null,
           ]}
         >
-          {this.props.renderIndicator({
-            position,
-            layout,
-            navigationState,
-            jumpTo,
-            addListener,
-            removeListener,
-            width: tabWidth,
-            style: indicatorStyle,
-          })}
+          {!this.props.isAutoSizeIndicator &&
+            this.props.renderIndicator({
+              position,
+              layout,
+              navigationState,
+              jumpTo,
+              addListener,
+              removeListener,
+              width: tabWidth,
+              style: indicatorStyle,
+            })}
+
+          {this.props.isAutoSizeIndicator &&
+            this._renderAutoWidthIndicator({
+              position,
+              layout,
+              navigationState,
+              jumpTo,
+              addListener,
+              removeListener,
+              width: this.indicatorWidth[navigationState.index],
+              style: indicatorStyle,
+            })}
         </Animated.View>
         <View style={styles.scroll}>
           <Animated.ScrollView
@@ -332,7 +369,7 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
             contentOffset={this.state.initialOffset}
             ref={el => (this._scrollView = el && el.getNode())}
           >
-            {routes.map((route: T) => (
+            {routes.map((route: T, i) => (
               <TabBarItem
                 key={route.key}
                 position={position}
@@ -358,6 +395,10 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
                 onLongPress={() => onTabLongPress && onTabLongPress({ route })}
                 labelStyle={labelStyle}
                 style={tabStyle}
+                onLayout={event => {
+                  const { width } = event.nativeEvent.layout;
+                  this.indicatorWidth[i] = width;
+                }}
               />
             ))}
           </Animated.ScrollView>
